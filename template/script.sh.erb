@@ -1,0 +1,22 @@
+#
+# Start RStudio Server
+#
+
+export PATH=/usr/lib/rstudio-server/bin:$PATH
+
+# PAM auth helper used by RStudio
+export RSTUDIO_AUTH="${PWD}/bin/pam-helper"
+
+
+cd "${HOME}"
+
+set -x
+
+USER=${USER}
+ rserver \
+ --server-user ${USER} \
+ --www-port ${port} \
+ --auth-none 0 \
+ --auth-encrypt-password 0 \
+ --auth-pam-helper-path=${RSTUDIO_AUTH} \
+ --rsession-path=/etc/rstudio/rsession.sh

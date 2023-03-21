@@ -1,0 +1,112 @@
+<%
+  # your image location will differ
+  ppn = num_cores.blank? ? 1 : num_cores.to_i
+  walltime = (bc_num_hours.to_i * 60)
+  
+  if slurm_partition.include?("gengpu")
+     node_type = "GPU"
+  else
+     node_type = "CPU"
+  end
+  
+  case node_type
+  when "CPU"
+   slurm_args = ["--nodes", "#{number_of_nodes}", "--ntasks", "#{ppn}", "--time", "#{walltime}", "--partition", "#{slurm_partition}", "--job-name", "#{job_name}", "--account", "#{slurm_account}","--mem" , "#{memory_per_node}G" ]
+  when "GPU"
+   slurm_args = ["--nodes", "#{number_of_nodes}", "--ntasks", "#{ppn}", "--time", "#{walltime}", "--partition", "#{slurm_partition}", "--job-name", "#{job_name}", "--account", "#{slurm_account}","--mem" , "#{memory_per_node}G", "--gres", "#{gres_value}" ]
+  end
+%>
+---
+batch_connect:
+  template: vnc
+  websockify_cmd: '/usr/bin/websockify'
+  script_wrapper: |
+    module purge
+    module load singularity
+    module load <%= version %>
+    module load <%= other_modules %>
+    cat << "CTRSCRIPT" > container.sh
+    export PATH="$PATH:/opt/TurboVNC/bin"
+    %s  
+    CTRSCRIPT
+
+    export container_image=/projects/a9009/sbc538/Projects/OpenOnDemand/rserver-singularity/rserver.sif
+
+    # Set working directory to home directory
+
+    export SINGULARITYENV_RSTUDIO_SESSION_TIMEOUT=0
+    R_HOME=$(R RHOME)
+    R_VERSION=$(R --version | head -1 | awk '{print $3}')
+    R_EXEC=`which R`
+
+    R_LIBS_USER=${HOME}/R/R_$R_VERSION
+    mkdir -p $R_LIBS_USER
+
+    # Need a unique /tmp for this job for /tmp/rstudio-rsession & /tmp/rstudio-server
+    WORKDIR=${HOME}/rserver/${SLURM_JOB_ID}
+    mkdir -m 700 -p ${WORKDIR}/tmp/rstudio-server  
+    mkdir -p ${WORKDIR}/var/run/{lock/rstudio-server,rstudio-server/rstudio-rsession,mount,systemd} ${WORKDIR}/var/lib/rstudio-server ${WORKDIR}/logs/{rstudio,rstudio-server}
+    uuidgen > ${WORKDIR}/tmp/rstudio-server/secure-cookie-key
+    chmod 600 ${WORKDIR}/tmp/rstudio-server/secure-cookie-key
+
+    cat >${WORKDIR}/rserver.conf <<END
+    # Server Configuration File
+    rsession-which-r=${R_EXEC}
+    auth-timeout-minutes=0
+    auth-stay-signed-in-days=10
+    session-use-file-storage=1
+    rsession-ld-library-path=${LD_LIBRARY_PATH}
+    END
+
+    # rsession needs to start with OMP_NUM_THREADS set to prevent OpenBLAS
+    # (and any other OpenMP-enhanced libraries used by R) from spawning too many
+    # threads. a wrapper script is created for rsession.
+    #
+    cat > ${WORKDIR}/rsession.sh <<END
+    #!/bin/sh
+    set -o xtrace
+    R_DOC_DIR=$R_HOME/doc
+    R_INCLUDE_DIR=$R_HOME/include
+    R_SHARE_DIR=$R_HOME/share
+    RSTUDIO_DEFAULT_R_VERSION_HOME=$R_HOME
+    RSTUDIO_DEFAULT_R_VERSION=$R_VERSION
+    PATH=$PATH:/usr/lib/rstudio-server/bin
+    export OMP_NUM_THREADS=${SLURM_JOB_CPUS_PER_NODE}
+    /usr/lib/rstudio-server/bin/rsession --r-libs-user=$R_LIBS_USER "\${@}" 
+    END
+
+    chmod +x ${WORKDIR}/rsession.sh
+
+    # [Rstudio 1.4] database is required
+    cat > ${WORKDIR}/database.conf <<END
+    provider=sqlite
+    directory=/var/lib/rstudio-server
+    END
+
+    # [Rstudio 1.4] configure logging
+    cat > ${WORKDIR}/logging.conf <<END
+    [@rserver]
+    log-level=info
+    max-size-mb=10
+    END
+
+    ## some binds that are necessary for running with singularity
+    export SING_BINDS=" --bind ${WORKDIR}/logs/rstudio-server:/var/log/rstudio-server --bind ${WORKDIR}/logs/rstudio:/var/log/rstudio --bind ${WORKDIR}/var/run:/var/run --bind ${WORKDIR}/var/lib/rstudio-server:/var/lib/rstudio-server  --bind ${WORKDIR}/tmp:/tmp"
+
+    ## use our specific configs
+    export SING_BINDS="$SING_BINDS --bind ${WORKDIR}/rserver.conf:/etc/rstudio/rserver.conf --bind ${WORKDIR}/database.conf:/etc/rstudio/database.conf --bind ${WORKDIR}/rsession.sh:/etc/rstudio/rsession.sh --bind ${WORKDIR}/logging.conf:/etc/rstudio/logging.conf"
+
+    ## quest stuff
+    export SING_BINDS="$SING_BINDS --bind /projects:/projects --bind /software:/software"
+    export SINGULARITYENV_PATH="$PATH"
+
+    singularity exec $SING_BINDS "${container_image}" /bin/bash container.sh
+
+  header: | 
+    #!/bin/bash
+        . ~/.bashrc
+script:
+  native:
+  <%- slurm_args.each do |arg| %>
+    - "<%= arg %>"
+  <%- end %>

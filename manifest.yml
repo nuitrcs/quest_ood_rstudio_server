@@ -1,0 +1,10 @@
+---
+name: RStudio Server Native
+icon: fa://rstudio
+category: Interactive Apps
+subcategory: Servers
+role: batch_connect
+description: |
+  This app will launch [RStudio Server] on a compute node on the Quest. 
+
+  [RStudio Server]: https://www.rstudio.com/products/rstudio-server/
