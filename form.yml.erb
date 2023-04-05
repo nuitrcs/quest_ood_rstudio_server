@@ -50,16 +50,16 @@ attributes:
     label: "Version of R to run in RStudio Server"
     help: "This defines the version of R you want to run in RStudio Server."
     options:
-      - [ "R-4.0.0", "R/4.0.0" ]
-      - [ "R-4.0.3", "R/4.0.3" ]
-      - [ "R-4.1.0", "R/4.1.0" ]
-      - [ "R-4.1.1", "R/4.1.1" ]
       - [ "R-4.2.0", "R/4.2.0" ]
+      - [ "R-4.1.1", "R/4.1.1" ]
+      - [ "R-4.1.0", "R/4.1.0" ]
+      - [ "R-4.0.3", "R/4.0.3" ]
+      - [ "R-4.0.0", "R/4.0.0" ]
 
   other_modules:
     label: "List of other modules you want to load into your RStudio Server environment."
     help: |
-     For example, you might want to load `geos/3.8.1` so that one can install and use the `rgeos` R packages."
+     For example, you might want to load `geos/3.8.1` so that one can install and use the `rgeos` R packages.
     value: ""
 
   job_name:
@@ -69,8 +69,8 @@ attributes:
   bc_num_hours:
     label: "Wall Clock Time"
     help: |
-      The maximum number of hours the Jupyter sessions will run for. You can always terminate your jupyter session early, but it will automatically be terminated by Slurm once the walltime is hit.
-    value: 1
+      The maximum number of hours RStudio Server will run for. You can always terminate your RStudio Server instance early, but it will automatically be terminated by Slurm once the walltime is hit.
+    default: 1
 
   slurm_partition: 
     label: "SLURM Partition"
@@ -98,7 +98,7 @@ attributes:
   num_cores:
     widget: "number_field"
     label: "Number of CPUs/cores/processors"
-    value: 1
+    default: 1
     help: |
       Please note that you likely do not need to request more than a single CPU unless you know that your application can be parallelized and also please note that the more cores requested, the longer the wait for the session to start.
     min: 1
@@ -109,10 +109,10 @@ attributes:
   memory_per_node:
     widget: "number_field"
     label: "Total memory or RAM do you need in GB."
-    value: 5
+    default: 5
     help: |
       How much total memory or RAM do you need in GB.
-    min: 0
+    min: 1
     max: 250
     step: 1
     id: 'memory_per_node'

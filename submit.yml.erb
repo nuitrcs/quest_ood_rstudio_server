@@ -96,7 +96,14 @@ batch_connect:
 
     export SINGULARITYENV_PATH="$PATH"
 
-    singularity exec $SING_BINDS "${container_image}" /bin/bash container.sh
+    ## Need to add the --nv flag if we are running on a GPU
+    <%- if gres_value != "" %>
+    export SING_GPU="--nv"
+    <%- else %>
+    export SING_GPU=""
+    <%- end %>
+
+    singularity exec $SING_GPU $SING_BINDS "${container_image}" /bin/bash container.sh
 
   header: | 
     #!/bin/bash
