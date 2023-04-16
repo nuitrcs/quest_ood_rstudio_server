@@ -28,9 +28,6 @@ batch_connect:
     R_VERSION=$(R --version | head -1 | awk '{print $3}')
     R_EXEC=`which R`
 
-    R_LIBS_USER=${HOME}/R/R_$R_VERSION
-    mkdir -p $R_LIBS_USER
-
     # Need a unique /tmp for this job for /tmp/rstudio-rsession & /tmp/rstudio-server
     WORKDIR=${HOME}/rserver/${SLURM_JOB_ID}
     mkdir -m 700 -p ${WORKDIR}/tmp/rstudio-server  
@@ -60,8 +57,9 @@ batch_connect:
     RSTUDIO_DEFAULT_R_VERSION_HOME=$R_HOME
     RSTUDIO_DEFAULT_R_VERSION=$R_VERSION
     PATH=$PATH:/usr/lib/rstudio-server/bin
-    export OMP_NUM_THREADS=${SLURM_JOB_CPUS_PER_NODE}
-    /usr/lib/rstudio-server/bin/rsession --r-libs-user=$R_LIBS_USER "\${@}" 
+    export OMP_NUM_THREADS=${SLURM_NPROCS}
+    export MC_CORES=$((${SLURM_NPROCS}-1))
+    /usr/lib/rstudio-server/bin/rsession "\${@}" 
     END
 
     chmod +x ${WORKDIR}/rsession.sh
@@ -110,18 +108,27 @@ batch_connect:
         . ~/.bashrc
 
 script:
+   <%- if user_email != "" %>
    email_on_started: true
+   <%- end %>
    native:
+     # What partition is the user submitting to
      - "--partition"
      - "<%= slurm_partition %>"
+     # Under what account is the user submitting this job
      - "--account"
      - "<%= slurm_account %>"
      # How much time (in hours)
      - "--time"
      - "<%= walltime %>"
      # How many nodes (always 1)
+     <%- if number_of_nodes != "" %>
+     - "--nodes"
+     - "<%= number_of_nodes %>"
+     <%- else %>
      - "--nodes"
      - "1"
+     <%- end %>
      # How many CPUs
      - "--ntasks-per-node"
      - "<%= ppn %>"
@@ -131,10 +138,12 @@ script:
      # Job Name
      - "--job-name"
      - "<%= job_name %>"
+     # If the user supplies an e-mail, then they will get an e-mail when the job begins
      <%- if user_email != "" %>
      - "--mail-user"
      - "<%= user_email %>"
      <%- end %>
+     # If the user requested a GPU, then we need to add this argument to our job submit command
      <%- if gres_value != "" %>
      - "--gres"
      - "<%= gres_value %>"
