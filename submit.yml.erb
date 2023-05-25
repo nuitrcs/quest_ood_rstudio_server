@@ -1,5 +1,5 @@
 <%
-  groups = OodSupport::User.new.groups.map(&:name).select { |word| word.start_with?('p', 'b', 'a') }
+  groups = OodSupport::User.new.groups.map(&:name).drop(1)
 
   # your image location will differ
   ppn = num_cores.blank? ? 1 : num_cores.to_i
@@ -84,13 +84,18 @@ batch_connect:
     export SING_BINDS="$SING_BINDS --bind ${WORKDIR}/rserver.conf:/etc/rstudio/rserver.conf --bind ${WORKDIR}/database.conf:/etc/rstudio/database.conf --bind ${WORKDIR}/rsession.sh:/etc/rstudio/rsession.sh --bind ${WORKDIR}/logging.conf:/etc/rstudio/logging.conf"
 
     ## quest stuff
-    export SING_BINDS="$SING_BINDS --bind /projects:/projects --bind /software:/software"
+    export SING_BINDS="$SING_BINDS --bind /software:/software"
+
+    # Only bind projects directories that the user would have access to based on their unix groups
+    <%- groups.each do |group| %>
+    export SING_BINDS="$SING_BINDS <%= File.directory?("/projects/#{group}") ? "--bind /projects/#{group}:/projects/#{group}" : "" %>"
+    <%- end %>
 
     # only bind /kellogg is individual is part of kellogg group
     export SING_BINDS="$SING_BINDS <%= groups.include?('kellogg') ? "--bind /kellogg/:/kellogg/" : "" %>"
 
     # only bind /scratch/<netid> if individual has a scratch space
-    export SING_BINDS="$SING_BINDS <%= File.exist?("/scratch/#{User.new.name}") ? "--bind /scratch/#{User.new.name}:/scratch/#{User.new.name}" : "" %>"
+    export SING_BINDS="$SING_BINDS <%= File.directory?("/scratch/#{User.new.name}") ? "--bind /scratch/#{User.new.name}:/scratch/#{User.new.name}" : "" %>"
 
     export SINGULARITYENV_PATH="$PATH"
 
