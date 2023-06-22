@@ -1,6 +1,6 @@
 ---
 name: RStudio Server
-icon: fa://rstudio
+icon: fa://server
 category: Interactive Apps
 subcategory: Servers
 role: batch_connect
