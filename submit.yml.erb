@@ -68,6 +68,8 @@ batch_connect:
     PATH=$PATH:/usr/lib/rstudio-server/bin
     export OMP_NUM_THREADS=${SLURM_NPROCS}
     export MC_CORES=$((${SLURM_NPROCS}-1))
+    export SLURM_NPROCS=${SLURM_NPROCS}
+    export SLURM_NTASKS=${SLURM_NTASKS}
     /usr/lib/rstudio-server/bin/rsession "\${@}" 
     END
 
