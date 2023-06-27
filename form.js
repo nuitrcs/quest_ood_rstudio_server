@@ -110,6 +110,18 @@ function toggle_number_of_nodes_visibility() {
     $("#batch_connect_session_context_request_more_than_one_node").is(':checked'));
 }
 
+function toggle_virtual_env_visibility() {
+  toggle_visibility_of_form_group(
+    '#batch_connect_session_context_virtual_env',
+    $("#batch_connect_session_context_use_virtual_env").is(':checked'));
+  toggle_visibility_of_form_group(
+    '#batch_connect_session_context_other_modules',
+    !$("#batch_connect_session_context_use_virtual_env").is(':checked'));
+  toggle_visibility_of_form_group(
+    '#batch_connect_session_context_version',
+    !$("#batch_connect_session_context_use_virtual_env").is(':checked'));
+}
+
 function set_available_accounts() {
   let assocs = get_associations();
   const selected_partition = $("#batch_connect_session_context_slurm_partition").val();
@@ -177,6 +189,13 @@ function set_more_than_one_node_change_handler() {
   });
 }
 
+function set_use_virtual_env_change_handler() {
+  let request_virtual_env = $("#batch_connect_session_context_use_virtual_env");
+  request_virtual_env.click(() => {
+    toggle_virtual_env_visibility();
+  });
+}
+
 /**
  * Sets the change handler for the slurm account select.
  */
@@ -192,6 +211,12 @@ function set_available_partitions() {
   const partitions = [...new Set(assocs.map(({ partition }) => partition))];
   replace_options($("#batch_connect_session_context_slurm_partition"), partitions);
 }
+
+function set_available_virtual_env() {
+  const virtual_env = $('#batch_connect_session_context_list_of_virtual_environments').val().split(" ");
+  replace_options($("#batch_connect_session_context_virtual_env"), virtual_env);
+}
+
 
 function collapse_help() {
   var help_message = $( '.form-text.text-muted' );
@@ -211,15 +236,18 @@ function collapse_help() {
  */
 $(document).ready(function() {
   set_available_partitions();
+  set_available_virtual_env();
   // Update available options appropriately
   let assocs = update_available_options();
   // Ensure that fields are shown or hidden based on what was set in the last session
   toggle_gres_value_field_visibility(assocs);
   update_min_max(assocs);
   toggle_number_of_nodes_visibility();
+  toggle_virtual_env_visibility();
   set_slurm_partition_change_handler();
   set_slurm_account_change_handler();
   set_more_than_one_node_change_handler();
+  set_use_virtual_env_change_handler();
   collapse_help();
   $(function () {
     $('[data-toggle="tooltip"]').tooltip({'boundary': $("body")});

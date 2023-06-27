@@ -1,13 +1,27 @@
 # Batch Connect app configuration file
 #
 # @note Used to define the submitted cluster, title, description, and
-
+#
+<%
+if File.exists?("#{Dir.home}/.conda/environments.txt")
+  fileObject = File.open("#{Dir.home}/.conda/environments.txt", "r")
+  virtual_environments = fileObject.read()
+  fileObject.close()
+else
+  virtual_environments = ""
+end
+%>
+---
 cluster: "quests"
 
 form:
   - version
   # What other modules need to be in your RStudio Server environment
   - other_modules
+  # This checkbox will allow people to use a virtual environment with RStudio Server
+  - use_virtual_env
+  # Using R from an anaconda virtual environment
+  - virtual_env
   # This allows the user to select which partition they submit to
   - slurm_partition
   # This allows a user to request a GPU
@@ -31,11 +45,12 @@ form:
   # these variables are for the JavaScript
   - raw_data
   - raw_group_data
+  - list_of_virtual_environments
 
 attributes:
   version:
     widget: select
-    label: "Version of R to run in RStudio Server"
+    label: "Quest installation of R to use in RStudio Server"
     help: "This defines the version of R you want to run in RStudio Server."
     options:
       - [ "R-4.3.0", "R/4.3.0" ]
@@ -51,6 +66,20 @@ attributes:
     help: |
      For example, you might want to load `geos/3.8.1` so that one can install and use the `rgeos` R packages.
     value: ""
+
+  use_virtual_env:
+    widget: "check_box"
+    label: "Select to use a virtual environment with RStudio Server"
+    help: |
+      This checkbox will allow you to use a R installed in a virtual environment with RStudio Server. Selecting this option will remove the ability to load Quest modules or use the Quest installations of R.
+
+  virtual_env:
+    label: "Choose the virtual environment that you want to use"
+    help: |
+    widget: select
+    help: |
+      The list of environments that you can choose from is taken from `$HOME/.conda/environments.txt` 
+    default: ""
 
   bc_num_hours:
     label: "Wall Time (in number of hours)"
@@ -92,7 +121,7 @@ attributes:
     widget: "check_box"
     label: "Request more than a single node (Optional)"
     help: |
-      Only check this box if you are confident that your application of choice can utilize CPUs across more than one node. In Python, some of these applications include MPI4py, Dask, and PySpark. Once checked, you will be shown another field where you can request multiple nodes.
+      Only check this box if you are confident that your application of choice can utilize CPUs across more than one node. Once checked, you will be shown another field where you can request multiple nodes.
 
   number_of_nodes:
     widget: "number_field"
@@ -102,7 +131,7 @@ attributes:
     step: 1
     id: 'number_of_nodes'
     help: |
-      How many nodes you want for this session. This will set the value of the `-N/--nodes` flag for your job. A reminder to check that your application of choice can utilize CPUs across more than one node. These applications/packages would include MPI4py, Dask, PySpark, etc. For more information on setting the number of nodes, please see the [number of nodes section](https://services.northwestern.edu/TDClient/30/Portal/KB/ArticleDet?ID=1964#section-number-of-nodes) of our Everything You Need to Know about Using Slurm on Quest page.
+      How many nodes you want for this session. This will set the value of the `-N/--nodes` flag for your job. A reminder to check that your application of choice can utilize CPUs across more than one node. For more information on setting the number of nodes, please see the [number of nodes section](https://services.northwestern.edu/TDClient/30/Portal/KB/ArticleDet?ID=1964#section-number-of-nodes) of our Everything You Need to Know about Using Slurm on Quest page.
 
   memory_per_node:
     widget: "number_field"
@@ -134,4 +163,10 @@ attributes:
     label: "linux groups for use by JavaScript"
     widget: hidden_field
     value: "<%= RawSlurmData.rawgroupdata %>"
+    cacheable: false
+
+  list_of_virtual_environments:
+    label: "List of user virtual environments for use by JavaScript"
+    widget: hidden_field
+    value: "<%= virtual_environments %>"
     cacheable: false

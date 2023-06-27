@@ -12,8 +12,13 @@ batch_connect:
   script_wrapper: |
     module purge
     module load singularity
+    <%- if virtual_env != "" %>
+    module load python-miniconda3/4.12.0
+    source activate <%= virtual_env %>
+    <%- else %>
     module load <%= version %>
     module load <%= other_modules %>
+    <%- end %>
     cat << "CTRSCRIPT" > container.sh
     export PATH="$PATH:/opt/TurboVNC/bin"
     %s  
@@ -41,7 +46,11 @@ batch_connect:
     auth-timeout-minutes=0
     auth-stay-signed-in-days=10
     session-use-file-storage=1
+    <%- if virtual_env != "" %>
+    rsession-ld-library-path=${CONDA_PREFIX}/lib
+    <%- else %>
     rsession-ld-library-path=${LD_LIBRARY_PATH}
+    <%- end %>
     END
 
     # rsession needs to start with OMP_NUM_THREADS set to prevent OpenBLAS
