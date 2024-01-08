@@ -95,7 +95,7 @@ batch_connect:
     export SING_BINDS="$SING_BINDS --bind ${WORKDIR}/rserver.conf:/etc/rstudio/rserver.conf --bind ${WORKDIR}/database.conf:/etc/rstudio/database.conf --bind ${WORKDIR}/rsession.sh:/etc/rstudio/rsession.sh --bind ${WORKDIR}/logging.conf:/etc/rstudio/logging.conf"
 
     ## quest stuff
-    export SING_BINDS="$SING_BINDS --bind /software:/software"
+    export SING_BINDS="$SING_BINDS --bind /software:/software --bind /hpc/software:/hpc/software"
 
     # Only bind projects directories that the user would have access to based on their unix groups
     <%- groups.each do |group| %>
