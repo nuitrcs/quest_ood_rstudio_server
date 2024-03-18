@@ -22,6 +22,9 @@ form:
   - use_virtual_env
   # Using R from an anaconda virtual environment
   - virtual_env
+  # This allows a user to whether they want to start with a fresh session
+  # or one that tries to pull in information from a previous or perhaps on-going session 
+  - start_clean_session
   # This allows the user to select which partition they submit to
   - slurm_partition
   # This allows a user to request a GPU
@@ -66,6 +69,12 @@ attributes:
     help: |
      For example, you might want to load `geos/3.8.1` so that one can install and use the `rgeos` R packages.
     value: ""
+
+  start_clean_session:
+    widget: "check_box"
+    label: "Launch a Clean RSession: Will not attempt to load previous session data"
+    help: |
+      Check this box if you want to start clean rsession one that will not attempt to load previous session data. 
 
   use_virtual_env:
     widget: "check_box"

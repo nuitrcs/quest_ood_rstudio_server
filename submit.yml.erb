@@ -19,6 +19,7 @@ batch_connect:
     # This is to ensure that all "other modules" can be loaded (even
     # those that require R be loaded first) while also loading R
     # last
+    module load git/2.37.2
     module load <%= version %>
     module load <%= other_modules %>
     module load <%= version %>
@@ -55,6 +56,11 @@ batch_connect:
     <%- else %>
     rsession-ld-library-path=${LD_LIBRARY_PATH}
     <%- end %>
+    END
+
+    cat > ${WORKDIR}/rsession.conf <<END
+    session-timeout-minutes=0
+    session-save-action-default=no
     END
 
     # rsession needs to start with OMP_NUM_THREADS set to prevent OpenBLAS
@@ -126,6 +132,10 @@ batch_connect:
     export SING_GPU="--nv"
     <%- else %>
     export SING_GPU=""
+    <%- end %>
+
+    <%- if start_clean_session == "1" %>
+    export SINGULARITYENV_XDG_DATA_HOME=${WORKDIR}
     <%- end %>
 
     singularity exec $SING_GPU $SING_BINDS "${container_image}" /bin/bash container.sh
