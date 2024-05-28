@@ -55,7 +55,9 @@ attributes:
     widget: select
     label: "Quest installation of R to use in RStudio Server"
     help: "This defines the version of R you want to run in RStudio Server."
+    display: true
     options:
+      - [ "R-4.4.0", "R/4.4.0" ]
       - [ "R-4.3.0", "R/4.3.0" ]
       - [ "R-4.2.3", "R/4.2.3" ]
       - [ "R-4.2.0", "R/4.2.0" ]
@@ -66,6 +68,7 @@ attributes:
 
   other_modules:
     label: "List of other modules you want to load into your RStudio Server environment."
+    display: true
     help: |
      For example, you might want to load `geos/3.8.1` so that one can install and use the `rgeos` R packages.
     value: ""
@@ -161,6 +164,7 @@ attributes:
   job_name:
     label: "Name of the Job"
     value: "RStudio Server"
+    display: true
 
   raw_data:
     label: "Account associations for use by JavaScript"
