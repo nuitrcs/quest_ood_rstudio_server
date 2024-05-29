@@ -29,14 +29,14 @@ batch_connect:
     %s  
     CTRSCRIPT
 
-    export container_image=/software/openondemand/rstudio-server/rserver-ood.sif
+    export container_image=/projects/a9009/sbc538/Projects/OpenOnDemand/rserver-singularity/quest-ood-rstudio-server.sif
 
     # Set working directory to home directory
 
     export SINGULARITYENV_RSTUDIO_SESSION_TIMEOUT=0
     R_HOME=$(R RHOME)
     R_VERSION=$(R --version | head -1 | awk '{print $3}')
-    R_EXEC=`which R`
+    R_EXEC=`which R --skip-alias`
 
     # Need a unique /tmp for this job for /tmp/rstudio-rsession & /tmp/rstudio-server
     WORKDIR=${HOME}/rserver/${SLURM_JOB_ID}
@@ -100,7 +100,7 @@ batch_connect:
     END
 
     cat > ${WORKDIR}/chrome <<END
-    LD_LIBRARY_PATH="" /opt/google/chrome/chrome --bwsi --disable-metrics --no-first-run --disable-translate --no-sandbox --headless "\${@}"
+    LD_LIBRARY_PATH="" /opt/chrome/linux-114.0.5735.90/chrome-linux64/chrome --bwsi --disable-metrics --no-first-run --disable-translate --no-sandbox --headless "\${@}"
     END
 
     chmod +x ${WORKDIR}/chrome
