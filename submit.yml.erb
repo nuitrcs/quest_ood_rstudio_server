@@ -81,6 +81,9 @@ batch_connect:
     export MC_CORES=$((${SLURM_NPROCS}-1))
     export SLURM_NPROCS=${SLURM_NPROCS}
     export SLURM_NTASKS=${SLURM_NTASKS}
+    export INCLUDE=${INCLUDE}
+    export C_INCLUDE_PATH=${C_INCLUDE_PATH}
+    export CPLUS_INCLUDE_PATH=${CPLUS_INCLUDE_PATH}
     /usr/lib/rstudio-server/bin/rsession "\${@}" 
     END
 
