@@ -218,7 +218,7 @@ function set_slurm_partition_change_handler() {
     let assocs = update_available_options();
     toggle_gres_value_field_visibility(assocs);
     update_constraint_options(assocs);
-    is_kellogg()
+    is_kellogg();
     update_min_max(assocs);
   });
 }
@@ -285,6 +285,8 @@ $(document).ready(function() {
   update_min_max(assocs);
   toggle_number_of_nodes_visibility();
   toggle_virtual_env_visibility();
+  update_constraint_options(assocs);
+  is_kellogg();
   set_slurm_partition_change_handler();
   set_slurm_account_change_handler();
   set_more_than_one_node_change_handler();
