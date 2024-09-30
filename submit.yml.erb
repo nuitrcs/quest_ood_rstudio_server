@@ -31,7 +31,16 @@ batch_connect:
     %s  
     CTRSCRIPT
 
-    export container_image=/software/openondemand/rstudio-server/rserver-ood.sif
+    # What is the OS *of the host*
+    HOST_OS=`uname -r`
+    # Where is this container
+    if [[ $HOST_OS =~ "el8" ]]; then
+        export container_image=/software/rhel8/quest_ondemand/quest_ood_rstudio_server/rstudio_server_2024.04.2_with_chrome_114.0.5735.90.sif
+    elif [[ $HOST_OS =~ "el7" ]]; then
+        export container_image=/software/openondemand/rstudio-server/rserver-ood.sif
+    else
+        echo "Host OS not recognized, no container found"
+    fi
 
     # Set working directory to home directory
 
