@@ -10,7 +10,6 @@ batch_connect:
   template: basic
   websockify_cmd: '/usr/bin/websockify'
   script_wrapper: |
-    source /hpc/software/spack_v20d1/spack/opt/spack/linux-rhel7-x86_64/gcc-4.8.5/lmod-8.7.24-ptfr7cudrme2v7y2nfktkkftnrgkezra/lmod/lmod/init/profile
 
     module purge
     module load singularity
@@ -25,6 +24,7 @@ batch_connect:
     module load <%= version %>
     module load <%= other_modules %>
     module load <%= version %>
+    module load openssl/1.0.2k-gcc-4.8.5
     <%- end %>
     cat << "CTRSCRIPT" > container.sh
     export PATH="$PATH:/opt/TurboVNC/bin"
@@ -35,7 +35,7 @@ batch_connect:
     HOST_OS=`uname -r`
     # Where is this container
     if [[ $HOST_OS =~ "el8" ]]; then
-        export container_image=/software/rhel8/quest_ondemand/quest_ood_rstudio_server/rstudio_server_2024.04.2_with_chrome_114.0.5735.90.sif
+        export container_image=/software/rhel8/quest_ondemand/quest_ood_rstudio_server/rhel8-rstudio-server-2024.09.0-394-chrome-114.0.5735.90.sif
     elif [[ $HOST_OS =~ "el7" ]]; then
         export container_image=/software/openondemand/rstudio-server/rserver-ood.sif
     else
@@ -60,6 +60,7 @@ batch_connect:
     # Server Configuration File
     rsession-which-r=${R_EXEC}
     auth-timeout-minutes=0
+    rsession-proxy-max-wait-secs=45
     auth-stay-signed-in-days=10
     session-use-file-storage=1
     <%- if virtual_env != "" %>
@@ -108,8 +109,8 @@ batch_connect:
 
     # [Rstudio 1.4] configure logging
     cat > ${WORKDIR}/logging.conf <<END
-    [@rserver]
-    log-level=info
+    [*]
+    log-level=debug
     max-size-mb=10
     END
 
