@@ -115,7 +115,7 @@ batch_connect:
     END
 
     cat > ${WORKDIR}/chrome <<END
-    LD_LIBRARY_PATH="" /opt/chrome/linux-114.0.5735.90/chrome-linux64/chrome --bwsi --disable-metrics --no-first-run --disable-translate --no-sandbox --headless "\${@}"
+    LD_LIBRARY_PATH="" /opt/chrome/linux-114.0.5735.90/chrome-linux64/chrome --bwsi --disable-metrics --no-first-run --disable-translate --no-sandbox --headless --use-gl=angle "\${@}"
     END
 
     chmod +x ${WORKDIR}/chrome
