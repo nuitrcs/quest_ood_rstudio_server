@@ -35,7 +35,7 @@ batch_connect:
     HOST_OS=`uname -r`
     # Where is this container
     if [[ $HOST_OS =~ "el8" ]]; then
-        export container_image=/software/rhel8/quest_ondemand/quest_ood_rstudio_server/rhel8-rstudio-server-2024.09.0-394-chrome-114.0.5735.90.sif
+        export container_image=/projects/a9009/sbc538/Projects/RHEL8/QuestOnDemand/quest_ood_rstudio_server/rhel8-rstudio-server-2024.09.1-394-chrome-114.0.5735.90.sif
     elif [[ $HOST_OS =~ "el7" ]]; then
         export container_image=/software/openondemand/rstudio-server/rserver-ood.sif
     else
@@ -114,8 +114,14 @@ batch_connect:
     max-size-mb=10
     END
 
+    cat > ${WORKDIR}/chrome-webgl <<END
+    Xvfb -ac :4070 -screen 0 1280x1024x16 &
+    export DISPLAY=:4070
+    LD_LIBRARY_PATH="" /opt/chrome/linux-114.0.5735.90/chrome-linux64/chrome --bwsi --disable-metrics --no-first-run --disable-translate --no-sandbox --headless --enable-webgl --disable-gpu "\${@}"
+    END
+
     cat > ${WORKDIR}/chrome <<END
-    LD_LIBRARY_PATH="" /opt/chrome/linux-114.0.5735.90/chrome-linux64/chrome --bwsi --disable-metrics --no-first-run --disable-translate --no-sandbox --headless --use-gl=angle "\${@}"
+    LD_LIBRARY_PATH="" /opt/chrome/linux-114.0.5735.90/chrome-linux64/chrome --bwsi --disable-metrics --no-first-run --disable-translate --no-sandbox --headless "\${@}"
     END
 
     chmod +x ${WORKDIR}/chrome
