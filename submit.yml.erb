@@ -131,7 +131,7 @@ batch_connect:
     export SING_BINDS=" --bind ${WORKDIR}/logs/rstudio-server:/var/log/rstudio-server --bind ${WORKDIR}/logs/rstudio:/var/log/rstudio --bind ${WORKDIR}/var/run:/var/run --bind ${WORKDIR}/var/lib/rstudio-server:/var/lib/rstudio-server  --bind ${WORKDIR}/tmp:/tmp"
 
     ## use our specific configs
-    export SING_BINDS="$SING_BINDS --bind ${WORKDIR}/rsession.conf:/etc/rstudio/rsession.conf --bind ${WORKDIR}/rserver.conf:/etc/rstudio/rserver.conf --bind ${WORKDIR}/database.conf:/etc/rstudio/database.conf --bind ${WORKDIR}/rsession.sh:/etc/rstudio/rsession.sh --bind ${WORKDIR}/logging.conf:/etc/rstudio/logging.conf --bind ${WORKDIR}/chrome:/etc/rstudio/chrome"
+    export SING_BINDS="$SING_BINDS --bind ${WORKDIR}/rsession.conf:/etc/rstudio/rsession.conf --bind ${WORKDIR}/rserver.conf:/etc/rstudio/rserver.conf --bind ${WORKDIR}/database.conf:/etc/rstudio/database.conf --bind ${WORKDIR}/rsession.sh:/etc/rstudio/rsession.sh --bind ${WORKDIR}/logging.conf:/etc/rstudio/logging.conf --bind ${WORKDIR}/chrome:/etc/rstudio/chrome --bind ${WORKDIR}/chrome-webgl:/etc/rstudio/chrome-webgl"
 
     ## quest stuff
     export SING_BINDS="$SING_BINDS --bind /software:/software --bind /hpc/software:/hpc/software"
