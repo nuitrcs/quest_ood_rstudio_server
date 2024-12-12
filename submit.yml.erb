@@ -114,10 +114,12 @@ batch_connect:
     max-size-mb=10
     END
 
-    cat > ${WORKDIR}/chrome-webgl <<END
+    cat > ${WORKDIR}/launch-xvfb <<END
     Xvfb -ac :4070 -screen 0 1280x1024x16 &
-    export DISPLAY=:4070
-    LD_LIBRARY_PATH="" /opt/chrome/linux-114.0.5735.90/chrome-linux64/chrome --bwsi --disable-metrics --no-first-run --disable-translate --no-sandbox --headless --enable-webgl --disable-gpu "\${@}"
+    END
+
+    cat > ${WORKDIR}/chrome-webgl <<END
+    DISPLAY=:4070 LD_LIBRARY_PATH="" /opt/chrome/linux-114.0.5735.90/chrome-linux64/chrome --bwsi --disable-metrics --no-first-run --disable-translate --no-sandbox --headless --enable-webgl --disable-gpu "\${@}"
     END
 
     cat > ${WORKDIR}/chrome <<END
@@ -126,12 +128,13 @@ batch_connect:
 
     chmod +x ${WORKDIR}/chrome
     chmod +x ${WORKDIR}/chrome-webgl
+    chmod +x ${WORKDIR}/launch-xvfb
 
     ## some binds that are necessary for running with singularity
     export SING_BINDS=" --bind ${WORKDIR}/logs/rstudio-server:/var/log/rstudio-server --bind ${WORKDIR}/logs/rstudio:/var/log/rstudio --bind ${WORKDIR}/var/run:/var/run --bind ${WORKDIR}/var/lib/rstudio-server:/var/lib/rstudio-server  --bind ${WORKDIR}/tmp:/tmp"
 
     ## use our specific configs
-    export SING_BINDS="$SING_BINDS --bind ${WORKDIR}/rsession.conf:/etc/rstudio/rsession.conf --bind ${WORKDIR}/rserver.conf:/etc/rstudio/rserver.conf --bind ${WORKDIR}/database.conf:/etc/rstudio/database.conf --bind ${WORKDIR}/rsession.sh:/etc/rstudio/rsession.sh --bind ${WORKDIR}/logging.conf:/etc/rstudio/logging.conf --bind ${WORKDIR}/chrome:/etc/rstudio/chrome --bind ${WORKDIR}/chrome-webgl:/etc/rstudio/chrome-webgl"
+    export SING_BINDS="$SING_BINDS --bind ${WORKDIR}/rsession.conf:/etc/rstudio/rsession.conf --bind ${WORKDIR}/rserver.conf:/etc/rstudio/rserver.conf --bind ${WORKDIR}/database.conf:/etc/rstudio/database.conf --bind ${WORKDIR}/rsession.sh:/etc/rstudio/rsession.sh --bind ${WORKDIR}/logging.conf:/etc/rstudio/logging.conf --bind ${WORKDIR}/chrome:/etc/rstudio/chrome --bind ${WORKDIR}/chrome-webgl:/etc/rstudio/chrome-webgl --bind ${WORKDIR}/launch-xvfb:/etc/rstudio/launch-xvfb"
 
     ## quest stuff
     export SING_BINDS="$SING_BINDS --bind /software:/software --bind /hpc/software:/hpc/software"
