@@ -35,7 +35,8 @@ function convert_gpu_partitions(GRES) {
     if (GRES.length !== 0) {
         for (const ind_gres of GRES) {
             const gpu_info = ind_gres.split(':');
-            for (let i = 1; i <= Number(gpu_info.slice(-1)); i++) {
+            var number_of_gpus = Number(gpu_info[2].split("(")[0]);
+            for (let i = 1; i <= number_of_gpus; i++) {
                 gpu_options.push([gpu_info[0], gpu_info[1], i].join(':'));
             }
         }
@@ -121,13 +122,12 @@ function update_constraint_options(assocs) {
   var constraints_with_commas = [...new Set(assocs.map(({ feature }) => feature))];
   var constraints_without_commas = [""];
   // Find all instances of quest10_rhel8 and quest13 and find and replace with "rhel8"
-  for (var constraint of constraints_with_commas) { constraints_without_commas.push(constraint.replace("quest10_rhel8", "rhel8").replace("quest13", "rhel8").split(",")); }
+  for (var constraint of constraints_with_commas) { constraints_without_commas.push(constraint.replace("quest10_rhel8", "quest13").split(",")); }
   replace_options($("#batch_connect_session_context_constraint"), [...new Set(constraints_without_commas.flat())]);
 }
 
 /**
  *  If kellogg, set some things
- */
 function is_kellogg() {
   if ($("#batch_connect_session_context_slurm_partition").val() === 'kellogg') {
     toggle_visibility_of_form_group(
@@ -143,6 +143,7 @@ function is_kellogg() {
       true);
   }
 }
+*/
 
 function toggle_number_of_nodes_visibility() {
   toggle_visibility_of_form_group(
@@ -219,7 +220,7 @@ function set_slurm_partition_change_handler() {
     let assocs = update_available_options();
     toggle_gres_value_field_visibility(assocs);
     update_constraint_options(assocs);
-    is_kellogg();
+    //is_kellogg();
     update_min_max(assocs);
   });
 }
@@ -287,7 +288,7 @@ $(document).ready(function() {
   toggle_number_of_nodes_visibility();
   toggle_virtual_env_visibility();
   update_constraint_options(assocs);
-  is_kellogg();
+  //is_kellogg();
   set_slurm_partition_change_handler();
   set_slurm_account_change_handler();
   set_more_than_one_node_change_handler();
