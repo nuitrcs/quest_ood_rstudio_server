@@ -58,7 +58,11 @@ batch_connect:
     <%- if virtual_env != "" %>
     rsession-ld-library-path=${CONDA_PREFIX}/lib
     <%- else %>
+    <%- if (version == "R/4.0.0") or (version == "R/4.1.0") %>
+    rsession-ld-library-path=/usr/lib64/:${LD_LIBRARY_PATH}
+    <%- else %>
     rsession-ld-library-path=${LD_LIBRARY_PATH}
+    <%- end %>
     <%- end %>
     END
 
