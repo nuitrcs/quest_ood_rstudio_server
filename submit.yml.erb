@@ -133,7 +133,7 @@ batch_connect:
     export SING_BINDS="$SING_BINDS --bind ${WORKDIR}/rsession.conf:/etc/rstudio/rsession.conf --bind ${WORKDIR}/rserver.conf:/etc/rstudio/rserver.conf --bind ${WORKDIR}/database.conf:/etc/rstudio/database.conf --bind ${WORKDIR}/rsession.sh:/etc/rstudio/rsession.sh --bind ${WORKDIR}/logging.conf:/etc/rstudio/logging.conf --bind ${WORKDIR}/chrome:/etc/rstudio/chrome --bind ${WORKDIR}/chrome-webgl:/etc/rstudio/chrome-webgl --bind ${WORKDIR}/launch-xvfb:/etc/rstudio/launch-xvfb"
 
     ## quest stuff
-    export SING_BINDS="$SING_BINDS --bind /software:/software --bind /hpc/software:/hpc/software"
+    export SING_BINDS="$SING_BINDS --bind /gpfs/projects:/gpfs/projects --bind /software:/software --bind /hpc/software:/hpc/software"
 
     # Only bind projects directories that the user would have access to based on their unix groups
     <%- groups.each do |group| %>
