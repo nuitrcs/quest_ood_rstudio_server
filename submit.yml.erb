@@ -92,6 +92,8 @@ batch_connect:
     export INCLUDE=${INCLUDE}
     export C_INCLUDE_PATH=${C_INCLUDE_PATH}
     export CPLUS_INCLUDE_PATH=${CPLUS_INCLUDE_PATH}
+    export UDUNITS2_INCLUDE="/hpc/software/spack_v20d1/spack/opt/spack/linux-rhel7-x86_64/gcc-4.8.5/udunits-2.2.24-35mdgjfwirb2evo7clknfa7ipibxmji5/include"
+    export UDUNITS2_LIBS="/hpc/software/spack_v20d1/spack/opt/spack/linux-rhel7-x86_64/gcc-4.8.5/udunits-2.2.24-35mdgjfwirb2evo7clknfa7ipibxmji5/lib"
     /usr/lib/rstudio-server/bin/rsession "\${@}" 
     END
 
@@ -127,17 +129,17 @@ batch_connect:
     chmod +x ${WORKDIR}/launch-xvfb
 
     ## some binds that are necessary for running with singularity
-    export SING_BINDS=" --bind ${WORKDIR}/logs/rstudio-server:/var/log/rstudio-server --bind ${WORKDIR}/logs/rstudio:/var/log/rstudio --bind ${WORKDIR}/var/run:/var/run --bind ${WORKDIR}/var/lib/rstudio-server:/var/lib/rstudio-server  --bind ${WORKDIR}/tmp:/tmp"
+    export SING_BINDS=" --bind ${WORKDIR}/logs/rstudio-server:/var/log/rstudio-server --bind ${WORKDIR}/logs/rstudio:/var/log/rstudio --bind ${WORKDIR}/var/run:/var/run --bind ${WORKDIR}/var/lib/rstudio-server:/var/lib/rstudio-server --bind ${WORKDIR}/tmp:/tmp"
 
     ## use our specific configs
     export SING_BINDS="$SING_BINDS --bind ${WORKDIR}/rsession.conf:/etc/rstudio/rsession.conf --bind ${WORKDIR}/rserver.conf:/etc/rstudio/rserver.conf --bind ${WORKDIR}/database.conf:/etc/rstudio/database.conf --bind ${WORKDIR}/rsession.sh:/etc/rstudio/rsession.sh --bind ${WORKDIR}/logging.conf:/etc/rstudio/logging.conf --bind ${WORKDIR}/chrome:/etc/rstudio/chrome --bind ${WORKDIR}/chrome-webgl:/etc/rstudio/chrome-webgl --bind ${WORKDIR}/launch-xvfb:/etc/rstudio/launch-xvfb"
 
     ## quest stuff
-    export SING_BINDS="$SING_BINDS --bind /gpfs/projects:/gpfs/projects --bind /software:/software --bind /hpc/software:/hpc/software"
+    export SING_BINDS="$SING_BINDS --bind /software:/software --bind /hpc/software:/hpc/software"
 
     # Only bind projects directories that the user would have access to based on their unix groups
     <%- groups.each do |group| %>
-    export SING_BINDS="$SING_BINDS <%= File.directory?("/projects/#{group}") ? "--bind /projects/#{group}:/projects/#{group}" : "" %>"
+    export SING_BINDS="$SING_BINDS <%= File.directory?("/projects/#{group}") ? "--bind /projects/#{group}:/projects/#{group} --bind /gpfs/projects/#{group}:/gpfs/projects/#{group}" : "" %>"
     <%- end %>
 
     # only bind /kellogg is individual is part of kellogg group
