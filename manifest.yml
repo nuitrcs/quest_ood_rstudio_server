@@ -9,6 +9,6 @@ description: |
 
   Please see [Using R on Quest] for more information about R on HPC.
 
-  [RStudio Server]: https://www.rstudio.com/products/rstudio-server/
+  [RStudio Server]: https://posit.co/products/open-source/rstudio-server/
   [Quest cluster]: https://www.it.northwestern.edu/departments/it-services-support/research/computing/quest/index.html
   [Using R on Quest]: https://services.northwestern.edu/TDClient/30/Portal/KB/ArticleDet?ID=1556
