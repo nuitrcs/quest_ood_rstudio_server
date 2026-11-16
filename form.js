@@ -49,6 +49,8 @@ function get_associations() {
   const raw_data = $('#batch_connect_session_context_raw_data').val();
   const raw_groups_data = $('#batch_connect_session_context_raw_group_data').val().split(",").filter(x => x);
   const general_access_allocations = raw_groups_data.filter(x => x.startsWith("p") || x.startsWith("e"))
+  const h_accounts = raw_groups_data.filter(x => /^h\d+$/.test(x));
+  const h_partitions = ['priority-cpu', 'priority-gpu'];
   const assocs = [];
   // Obtain all unique partition and allocation combinations
   for (const assoc of raw_data.split(" ").filter(x => x)) {
@@ -62,7 +64,17 @@ function get_associations() {
                       max_mem: MEMORY,
                       max_cpus: CPUS,
                       feature: FEATURE});
-    } else if (GROUPS.includes("all") && (general_access_allocations.length !== 0) && (PARTITION !== 'a9009') && (PARTITION !== 'buyin-dev')) {
+    } else if (GROUPS.includes("all") && (h_accounts.length !== 0) && h_partitions.includes(PARTITION.replace('*', ''))) {
+        for (const h_acct of h_accounts) {
+            assocs.push({ partition: PARTITION.replace('*', ''),
+                          account: h_acct,
+                          maxtime : convert_timelimit(TIMELIMIT),
+                          gpus: GRES,
+                          max_mem: MEMORY,
+                          max_cpus: CPUS,
+                          feature: FEATURE});
+        }
+    } else if (GROUPS.includes("all") && (general_access_allocations.length !== 0) && (PARTITION !== 'a9009') && (PARTITION !== 'buyin-dev') && !PARTITION.startsWith('priority-')) {
         for (let gen_access of general_access_allocations) {
             assocs.push({ partition: PARTITION.replace('*', ''),
                           account: gen_access,
